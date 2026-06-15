@@ -47,8 +47,14 @@
     padding:clamp(3rem,7vw,5rem) 1.5rem 3.5rem;line-height:1.5;
     -webkit-font-smoothing:antialiased;position:relative;
   }
-  #term{position:fixed;inset:0;z-index:0;opacity:.34;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:16px 20px}
+  #term{position:fixed;inset:0;z-index:0;opacity:.34;pointer-events:none;overflow:hidden;display:flex;flex-direction:row;gap:30px;padding:16px 22px}
+  #term .col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
   #term .ti{font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgba(57,255,139,.9);white-space:pre-wrap;word-break:break-word;text-shadow:0 0 6px rgba(57,255,139,.35)}
+  #signal{position:fixed;top:14px;right:16px;z-index:6;display:flex;align-items:center;gap:8px;font:600 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;text-transform:uppercase;color:#bfffd6;background:rgba(5,16,10,.55);border:1px solid rgba(57,255,139,.35);border-radius:999px;padding:7px 12px 7px 11px;cursor:pointer;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);user-select:none}
+  #signal .dot{width:9px;height:9px;border-radius:50%;background:#39ff8b;box-shadow:0 0 8px rgba(57,255,139,.9);animation:sigblink 1.4s ease-in-out infinite}
+  #signal.tx .dot{animation:none;background:#0d3b22;box-shadow:none}
+  #signal.tx .dot.on{background:#9dffc4;box-shadow:0 0 10px #39ff8b,0 0 22px rgba(57,255,139,.85)}
+  @keyframes sigblink{0%,100%{opacity:1}50%{opacity:.2}}
   .wrap{position:relative;z-index:1;width:100%;max-width:720px;display:flex;flex-direction:column;align-items:center}
 
   header{text-align:center;margin-bottom:clamp(2.4rem,5vw,3.4rem)}
@@ -136,7 +142,8 @@
 </style>
 </head>
 <body>
-  <div id="term" aria-hidden="true"><div class="ti"></div></div>
+  <div id="term" aria-hidden="true"></div>
+  <div id="signal" title="Transmitir sinal"><span class="dot"></span><span>SIGNAL ON</span></div>
   <main class="wrap">
     <header>
       <span class="title">Cicatrizes na Areia</span>
@@ -190,12 +197,84 @@
 
   <script>
     (function(){
-      var t=document.querySelector("#term .ti"); if(!t) return;
+      var term=document.getElementById("term"); if(!term) return;
       var lines=["$ ssh root@10.14.22.7 -p 22", "> negotiating cipher suite: AES-256-GCM ... OK", "> remote key SHA256:9f3a8e...c1  (NO SUCH AGENCY)", "> bypassing perimeter ids/ips .......... [BYPASSED]", "Last login: from 172.16.0.0 on tty1", "root@nsa:~# uname -a", "Linux nsa-core 6.8.0-classified #1 SMP x86_64 GNU/Linux", "root@nsa:~# whoami", "root", "root@nsa:~# cd /root && ls -la", "drwx------  14 root root   4096 ./", "drwx------  22 root root   4096 ../", "-rw-------   1 root root  16384 prism.keyring", "-rw-------   1 root root 262144 xkeyscore.db", "drwx------   9 root root   4096 classified/", "root@nsa:/root# cat /etc/agency.conf", "codename  = \"NO SUCH AGENCY\"", "clearance = TS//SCI", "status    = [REDACTED]", "root@nsa:/root# ./unlock --vault prism.keyring", "> deriving key (pbkdf2, 600000 it) ......", "> AES-256 decrypt ......... 23%", "> AES-256 decrypt ......... 67%", "> AES-256 decrypt ......... 100%  [OK]", "> ACCESS GRANTED", "root@nsa:/root# traceroute target", " 1  10.0.0.1      0.4 ms", " 2  172.16.31.4   1.1 ms", " 3  [REDACTED]    *  *  *", "WARN: counter-intrusion sweep detected", "> rerouting via proxychains: 9 hops ... OK", "> scrubbing session logs ............ done", "root@nsa:/root# echo \"we were never here\"", "we were never here", "______________________________________", "      N O   S U C H   A G E N C Y", "______________________________________", "> re-establishing secure tunnel ..."];
-      var i=0, buf=[];
-      function tick(){ buf.push(lines[i % lines.length]); i++; if(buf.length>160) buf.shift(); t.textContent=buf.join(String.fromCharCode(10)); }
-      for(var k=0;k<70;k++) tick();
+      var NL=String.fromCharCode(10);
+      var cols=[], buf=[], idx=[];
+      function build(){
+        var n=Math.max(1, Math.floor(window.innerWidth/360));
+        term.innerHTML=""; cols=[]; buf=[]; idx=[];
+        for(var c=0;c<n;c++){
+          var d=document.createElement("div"); d.className="col";
+          var ti=document.createElement("div"); ti.className="ti";
+          d.appendChild(ti); term.appendChild(d);
+          cols.push(ti); buf.push([]); idx.push(Math.floor(Math.random()*lines.length));
+          for(var k=0;k<90;k++){ buf[c].push(lines[idx[c] % lines.length]); idx[c]++; }
+          cols[c].textContent=buf[c].join(NL);
+        }
+      }
+      function tick(){
+        for(var c=0;c<cols.length;c++){
+          buf[c].push(lines[idx[c] % lines.length]); idx[c]++;
+          if(buf[c].length>220) buf[c].shift();
+          cols[c].textContent=buf[c].join(NL);
+        }
+      }
+      build();
+      var rt; window.addEventListener("resize", function(){ clearTimeout(rt); rt=setTimeout(build,250); });
       setInterval(tick, 140);
+    })();
+  </script>
+  <script>
+    (function(){
+      var MORSE={"A":".-","B":"-...","C":"-.-.","D":"-..","E":".","F":"..-.","G":"--.","H":"....","I":"..","J":".---","K":"-.-","L":".-..","M":"--","N":"-.","O":"---","P":".--.","Q":"--.-","R":".-.","S":"...","T":"-","U":"..-","V":"...-","W":".--","X":"-..-","Y":"-.--","Z":"--..",".":".-.-.-"};
+      var TEXT="THE SAND SHIFTS. THE TRUTH HIDES. WE ARE NOT BOTS.";
+      var U=55, tones=[], t=0, ch=TEXT.toUpperCase().split("");
+      for(var ci=0;ci<ch.length;ci++){
+        var c=ch[ci];
+        if(c===" "){ t+=7*U; continue; }
+        var code=MORSE[c]; if(!code){ t+=3*U; continue; }
+        for(var si=0;si<code.length;si++){
+          var d=(code[si]==="-"?3:1)*U;
+          tones.push({s:t,d:d}); t+=d+U;
+        }
+        t+=2*U;
+      }
+      var total=t;
+      var sig=document.getElementById("signal");
+      var dot=sig?sig.querySelector(".dot"):null;
+      var done=false, ctx=null;
+      function schedule(){
+        try{
+          var osc=ctx.createOscillator(); osc.type="sine"; osc.frequency.value=620;
+          var g=ctx.createGain(); g.gain.value=0.0001; osc.connect(g); g.connect(ctx.destination);
+          var t0=ctx.currentTime+0.06;
+          for(var i=0;i<tones.length;i++){
+            var st=t0+tones[i].s/1000, en=st+tones[i].d/1000;
+            g.gain.setValueAtTime(0.0001,st);
+            g.gain.exponentialRampToValueAtTime(0.13, st+0.008);
+            g.gain.setValueAtTime(0.13, en-0.008);
+            g.gain.exponentialRampToValueAtTime(0.0001, en);
+          }
+          osc.start(t0); osc.stop(t0+total/1000+0.25);
+        }catch(e){}
+        if(sig) sig.classList.add("tx");
+        for(var j=0;j<tones.length;j++){(function(tn){
+          setTimeout(function(){ if(dot) dot.classList.add("on"); }, tn.s);
+          setTimeout(function(){ if(dot) dot.classList.remove("on"); }, tn.s+tn.d);
+        })(tones[j]);}
+        setTimeout(function(){ if(sig) sig.classList.remove("tx"); }, total+250);
+      }
+      function fire(){
+        if(done) return;
+        try{
+          ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+          ctx.resume().then(function(){ if(!done && ctx.state==="running"){ done=true; schedule(); } }).catch(function(){});
+        }catch(e){}
+      }
+      window.addEventListener("load", fire);
+      ["pointerdown","keydown","touchstart"].forEach(function(ev){ window.addEventListener(ev, fire, {passive:true}); });
+      if(sig) sig.addEventListener("click", function(){ done=false; fire(); });
     })();
   </script>
 </body>
