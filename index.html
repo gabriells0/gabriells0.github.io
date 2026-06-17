@@ -50,7 +50,12 @@
   #term{position:fixed;inset:0;z-index:0;opacity:.34;pointer-events:none;overflow:hidden;display:flex;flex-direction:row;gap:30px;padding:16px 22px}
   #term .col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
   #term .ti{font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgba(57,255,139,.9);white-space:pre-wrap;word-break:break-word;text-shadow:0 0 6px rgba(57,255,139,.35)}
-  #signal{position:fixed;top:14px;right:16px;z-index:6;display:flex;align-items:center;gap:8px;font:600 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;text-transform:uppercase;color:#bfffd6;background:rgba(5,16,10,.55);border:1px solid rgba(57,255,139,.35);border-radius:999px;padding:7px 12px 7px 11px;cursor:pointer;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);user-select:none}
+  #sigwrap{position:fixed;top:14px;right:16px;z-index:6;display:flex;align-items:center;gap:10px}
+  #sighint{font:600 10px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#bfffd6;white-space:nowrap;text-shadow:0 0 8px rgba(57,255,139,.5);animation:sighint 1.1s ease-in-out infinite}
+  #sighint b{font-weight:700;font-size:1.2em}
+  #sigwrap.played #sighint{display:none}
+  @keyframes sighint{0%,100%{opacity:.4;transform:translateX(0)}50%{opacity:1;transform:translateX(4px)}}
+  #signal{display:flex;align-items:center;gap:8px;font:600 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;text-transform:uppercase;color:#bfffd6;background:rgba(5,16,10,.55);border:1px solid rgba(57,255,139,.35);border-radius:999px;padding:7px 12px 7px 11px;cursor:pointer;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);user-select:none}
   #signal .dot{width:9px;height:9px;border-radius:50%;background:#39ff8b;box-shadow:0 0 8px rgba(57,255,139,.9);animation:sigblink 1.4s ease-in-out infinite}
   #signal.tx .dot{animation:none;background:#0d3b22;box-shadow:none}
   #signal.tx .dot.on{background:#9dffc4;box-shadow:0 0 10px #39ff8b,0 0 22px rgba(57,255,139,.85)}
@@ -143,7 +148,10 @@
 </head>
 <body>
   <div id="term" aria-hidden="true"></div>
-  <div id="signal" title="Transmitir sinal"><span class="dot"></span><span>SIGNAL ON</span></div>
+  <div id="sigwrap">
+    <span id="sighint" aria-hidden="true">clique aqui&nbsp;<b>&rarr;</b></span>
+    <div id="signal" title="Transmitir sinal"><span class="dot"></span><span>SIGNAL ON</span></div>
+  </div>
   <main class="wrap">
     <header>
       <span class="title">Cicatrizes na Areia</span>
@@ -228,7 +236,7 @@
   <script>
     (function(){
       var MORSE={"A":".-","B":"-...","C":"-.-.","D":"-..","E":".","F":"..-.","G":"--.","H":"....","I":"..","J":".---","K":"-.-","L":".-..","M":"--","N":"-.","O":"---","P":".--.","Q":"--.-","R":".-.","S":"...","T":"-","U":"..-","V":"...-","W":".--","X":"-..-","Y":"-.--","Z":"--..",".":".-.-.-"};
-      var TEXT="THE SAND SHIFTS. THE TRUTH HIDES. WE ARE NOT BOTS.";
+      var TEXT="THE SAND SHIFTS. THE TRUTH HIDES. WE ARE NOT BOTS. GOD BLESS AMERICA";
       var U=55, tones=[], t=0, ch=TEXT.toUpperCase().split("");
       for(var ci=0;ci<ch.length;ci++){
         var c=ch[ci];
@@ -258,6 +266,7 @@
           }
           osc.start(t0); osc.stop(t0+total/1000+0.25);
         }catch(e){}
+        var sw=document.getElementById("sigwrap"); if(sw) sw.classList.add("played");
         if(sig) sig.classList.add("tx");
         for(var j=0;j<tones.length;j++){(function(tn){
           setTimeout(function(){ if(dot) dot.classList.add("on"); }, tn.s);
