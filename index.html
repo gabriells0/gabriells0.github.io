@@ -239,19 +239,19 @@ dialog.lightbox::backdrop{background:rgba(0,0,0,.88)}
         <p class="section-sub">Vertical, made for the feed.</p>
       </div>
       <div class="vrow">
-        <button class="vcard" data-video="" data-poster="" data-title="Surf and action" data-vertical style="--bg-g:linear-gradient(160deg,#134E5E 0%,#71B280 100%)">
+        <button class="vcard" data-video="" data-poster="" data-title="Vertical - Surf and action" data-vertical style="--bg-g:linear-gradient(160deg,#134E5E 0%,#71B280 100%)">
           <span class="play play--xs"></span>
           <span class="label"><span>Surf and action</span><strong>[Project name]</strong></span>
         </button>
-        <button class="vcard" data-video="" data-poster="" data-title="Scars in the Sand cutdown" data-vertical style="--bg-g:linear-gradient(160deg,#0F2027 0%,#203A43 50%,#2C5364 100%)">
+        <button class="vcard" data-video="" data-poster="" data-title="Vertical - Trailer cutdown" data-vertical style="--bg-g:linear-gradient(160deg,#0F2027 0%,#203A43 50%,#2C5364 100%)">
           <span class="play play--xs"></span>
           <span class="label"><span>Trailer cutdown</span><strong>Scars in the Sand</strong></span>
         </button>
-        <button class="vcard" data-video="" data-poster="" data-title="Brand" data-vertical style="--bg-g:linear-gradient(160deg,#232526 0%,#414345 100%)">
+        <button class="vcard" data-video="" data-poster="" data-title="Vertical - Brand" data-vertical style="--bg-g:linear-gradient(160deg,#232526 0%,#414345 100%)">
           <span class="play play--xs"></span>
           <span class="label"><span>Brand</span><strong>[Project name]</strong></span>
         </button>
-        <button class="vcard" data-video="" data-poster="" data-title="AI-assisted" data-vertical style="--bg-g:linear-gradient(160deg,#0F0C29 0%,#302B63 55%,#24243E 100%)">
+        <button class="vcard" data-video="" data-poster="" data-title="Vertical - AI-assisted" data-vertical style="--bg-g:linear-gradient(160deg,#0F0C29 0%,#302B63 55%,#24243E 100%)">
           <span class="play play--xs"></span>
           <span class="label"><span>AI-assisted</span><strong>[Project name]</strong></span>
         </button>
@@ -304,8 +304,7 @@ dialog.lightbox::backdrop{background:rgba(0,0,0,.88)}
   <div class="wrap">
     <h2>Let’s make something.</h2>
     <p class="lead">Open to remote roles and freelance edits.</p>
-    <a class="email" href="mailto:your@email.com">[your@email.com]</a>
-    <p class="links">gabriells0.com · <a href="https://vimeo.com/" rel="noopener">[Vimeo]</a> · <a href="https://www.linkedin.com/" rel="noopener">[LinkedIn]</a></p>
+    <a class="email" href="mailto:gabriells0@protonmail.com">gabriells0@protonmail.com</a>
   </div>
 </section>
 
@@ -360,6 +359,9 @@ dialog.lightbox::backdrop{background:rgba(0,0,0,.88)}
     }
 
     if (!info) { el.disabled = true; return; }
+
+    var hint = el.querySelector('.cap--r');
+    if (hint) hint.remove();
 
     el.addEventListener('click', function () {
       var vertical = el.hasAttribute('data-vertical');
